@@ -69,48 +69,15 @@ int main()
           if (err > 0.65) err = 0.65;  // limiting
           else if (err < -0.65) err = -0.65;
 
-/*
-          if (fabs(cte) < 0.8)
-          {
-            steer_value = (angle * 5.0 + err) / 6.0;  // weighted avg.
-            //throttle += 0.1; // accelerate
-          }
-          else if (fabs(cte) < 1.4)
-          {
-            steer_value = (angle * 1.5 + err) / 2.5;  // weighted avg.
-            //throttle -= 0.1; // accelerate
-          }
-          else
-          {
-            //if (fabs(cte) > 2.4 && speed > 25)
-            //  throttle = -0.3; // decelerate
-            //else
-            //  throttle = 0.3; // accelerate
-
-            steer_value = (angle + err) / 2.0;  // weighted avg.
-          }
-*/
           steer_value = (err * fabs(cte) + angle) / (fabs(cte) + 1);  // weighted avg.
-
-//          if (fabs(cte) > 0.85)
-//            steer_value = (angle + err) / 2.0;  // weighted avg.
-//          else
-//            steer_value = (angle * 5.0 + err) / 6.0;  // weighted avg.
 
           if (steer_value > 0.45) steer_value = 0.45;  // limiting
           else if (steer_value < -0.45) steer_value = -0.45;
 
-//          steer_value = (angle * 3.0 + err) / 4.0;  // weighted avg.
-
-//          if (err2 > 3.0) err2 = 3.0;  // limiting
-//          if (speed > 22 || fabs(steer_value) > 0.6)
-//            throttle = (2.0 - err2) * 0.8;
-//          else
-//            throttle = (3.0 - err2) * 0.8;
-            throttle = 0.9 - err2; // 0.9
+          throttle = 0.9 - err2;
 
           // DEBUG
-          std::cout << "CTE: " << cte << " Steering Value: " << angle << " -> " << steer_value << std::endl;
+          //std::cout << "CTE: " << cte << " Steering Value: " << angle << " -> " << steer_value << std::endl;
 
           json msgJson;
           msgJson["steering_angle"] = steer_value;
