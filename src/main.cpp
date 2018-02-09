@@ -34,8 +34,8 @@ int main()
 
   PID pid, pid2;
   // Initializing the pid variable
-  pid.init(0.22, 0.0001, 10.0);
-  pid2.init(0.8, 0.00001, 0.1);
+  pid.init(0.32, 0.0001, 10.0);
+  pid2.init(0.3, 0.00001, 0.1);
 
   h.onMessage([&pid, &pid2](uWS::WebSocket<uWS::SERVER> ws, char *data, size_t length, uWS::OpCode opCode) {
     // "42" at the start of the message means there's a websocket message event.
@@ -51,7 +51,7 @@ int main()
           // j[1] is the data JSON object
           double cte = std::stod(j[1]["cte"].get<std::string>());
 //          double speed = std::stod(j[1]["speed"].get<std::string>());
-          double angle = deg2rad(std::stod(j[1]["steering_angle"].get<std::string>()));
+//          double angle = deg2rad(std::stod(j[1]["steering_angle"].get<std::string>()));
           double steer_value;
           double throttle = 0.4;
 
@@ -66,15 +66,26 @@ int main()
           * another PID controller to control the speed!
           */
 
-          if (err > 0.65) err = 0.65;  // limiting
-          else if (err < -0.65) err = -0.65;
+          // limiting max. steering angle based on cte magnitude
+          if (fabs(cte) < 1.8)
+          {
+            if (err > 0.07) steer_value = 0.07;
+            else if (err < -0.07) steer_value = -0.07;
+          }
+          else if (fabs(cte) < 2.7)
+          {
+            if (err > 0.3) steer_value = 0.3;
+            else if (err < -0.3) steer_value = -0.3;
+          }
+          else
+          {
+            if (err > 0.7) steer_value = 0.7;
+            else if (err < -0.7) steer_value = -0.7;
+            else steer_value = err;
+          }
 
-          steer_value = (err * fabs(cte) + angle) / (fabs(cte) + 1);  // weighted avg.
-
-          if (steer_value > 0.45) steer_value = 0.45;  // limiting
-          else if (steer_value < -0.45) steer_value = -0.45;
-
-          throttle = 0.9 - err2;
+          // higher max. speed
+          throttle = 1.7 - err2;
 
           // DEBUG
           //std::cout << "CTE: " << cte << " Steering Value: " << angle << " -> " << steer_value << std::endl;
