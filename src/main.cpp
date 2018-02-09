@@ -34,10 +34,10 @@ int main()
 
   PID pid, pid2;
   // Initializing the pid variable
-  pid.init(0.32, 0.0001, 10.0);
-  pid2.init(0.3, 0.00001, 0.1);
+  pid.init(0.32, 0.0001, 16.0);
+//  pid2.init(0.3, 0.00001, 0.1);
 
-  h.onMessage([&pid, &pid2](uWS::WebSocket<uWS::SERVER> ws, char *data, size_t length, uWS::OpCode opCode) {
+  h.onMessage([&pid/*, &pid2*/](uWS::WebSocket<uWS::SERVER> ws, char *data, size_t length, uWS::OpCode opCode) {
     // "42" at the start of the message means there's a websocket message event.
     // The 4 signifies a websocket message
     // The 2 signifies a websocket event
@@ -56,9 +56,9 @@ int main()
           double throttle = 0.4;
 
           pid.updateError(cte);
-          pid2.updateError(cte);
+//          pid2.updateError(cte);
           double err = -1 * pid.totalError();
-          double err2 = fabs(pid.totalError());
+//          double err2 = fabs(pid2.totalError());
           /*
           * TODO: Calcuate steering value here, remember the steering value is
           * [-1, 1].
@@ -67,25 +67,32 @@ int main()
           */
 
           // limiting max. steering angle based on cte magnitude
-          if (fabs(cte) < 1.8)
-          {
-            if (err > 0.07) steer_value = 0.07;
-            else if (err < -0.07) steer_value = -0.07;
-          }
-          else if (fabs(cte) < 2.7)
-          {
-            if (err > 0.3) steer_value = 0.3;
-            else if (err < -0.3) steer_value = -0.3;
-          }
-          else
-          {
-            if (err > 0.7) steer_value = 0.7;
-            else if (err < -0.7) steer_value = -0.7;
-            else steer_value = err;
-          }
+//          if (fabs(cte) < 1.8)
+//          {
+//            if (err > 0.07) steer_value = 0.07;
+//            else if (err < -0.07) steer_value = -0.07;
+//          }
+//          else if (fabs(cte) < 2.7)
+//          {
+//            if (err > 0.3) steer_value = 0.3;
+//            else if (err < -0.3) steer_value = -0.3;
+//          }
+//          else
+//          {
+//            if (err > 0.7) steer_value = 0.7;
+//            else if (err < -0.7) steer_value = -0.7;
+//            else steer_value = err;
+//          }
+          
+
+          if (err > 1.0) steer_value = 1.0;
+          else if (err < -1.0) steer_value = -1.0;
+          else steer_value = err;
+            
 
           // higher max. speed
-          throttle = 1.7 - err2;
+//          throttle = 1.2 - err2;
+          throttle = 0.3;
 
           // DEBUG
           //std::cout << "CTE: " << cte << " Steering Value: " << angle << " -> " << steer_value << std::endl;
